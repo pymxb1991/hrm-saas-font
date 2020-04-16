@@ -123,62 +123,54 @@
         <!--数据结束 -->
       </el-card>
     </div>
-    <!--visible.sync 当前对话框是否显示 true/false 显示/隐藏 -->
-    <el-dialog title="编辑部门" :visible.sync="dialogFormVisible">
-      <!-- model 数据模型 -->
-      <el-form :model="dept" label-width="120px">
-        <el-form-item label="部门名称" >
-          <el-input v-model="dept.name" autocomplete="off"></el-input>
-        </el-form-item>
-       
-        <el-form-item label="部门编码" >
-          <el-input v-model="dept.code" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="部门负责人" >
-          <el-input v-model="dept.manager" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="部门介绍" >
-          <el-input v-model="dept.introduce" autocomplete="off"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveDept()">确 定</el-button>
-      </div>
-    </el-dialog>
+  <!-- 引入组件-->
+    <component v-bind:is="deptAdd" ref="addDept"></component>
   </div>
 </template>
  <!-- 组件化开发，定义组合步骤
     1、定义插件，把希望抽取的内容放到插件里面中去；
     2、抽取好之后，把插件定义到这边
     3、做数据交互的一个数据改造
-
  -->
-<!-- 引入组件 -->
+<!-- 引入组件
+     1、首先先 import 定义的组件 example: import deptAdd from './../components/add'
+     2、在父的页面中，通过componets:{} 来指定需要使用的组件有哪些 example:  components:{deptAdd},
+     3、把定义的组件绑定到模型上；
+     4、引入组件 ：通过 <component v-bind:is=""></component>  is="deptAdd" 也就是说要引入deptAdd组件，注意：此处要填写的是一个模型名称
+ -->
+<!-- 页面渲染步骤
+     1、首先通过组件，根据模型名称，查找对应的模型： <component v-bind:is="deptAdd"></component>
+     2、然后根据模型中指定的名称，去查找对应的组件：  deptAdd:'deptAdd',  ------》  components:{deptAdd},
+-->
+<!-- 如何在父页面中引用子组件内容  主要根据别名来引用  ref=""  this.$refs.addDept.属性  -->
 <script>
 // 引入API
 import { list,saveorupdate ,find,deleteById} from "@/api/base/dept";
-
 import commonApi from "@/utils/common";
+//引入自定义的组件
+import deptAdd from './../components/add'
+
 export default {
+  //注册Add 组件 
+  components:{deptAdd},
+
   data() {
     return {
+      deptAdd:'deptAdd',
       activeName: "first",
       departData: {},
       depts: [],
-
-      //构造父部门模型，绑定父部门；
-      parentId: '',
-      dialogFormVisible:false,
-      dept:{}
     };
   },
-  methods: {
-    //构造添加部门方法
+  methods: {   
+     //构造添加部门方法
     handlAdd(parentId) {
       console.log("parentId",parentId);
-      this.parentId = parentId;
-      this.dialogFormVisible = true;
+      //父页面调用子组件中的内容
+      this.$refs.addDept.parentId = parentId;
+      this.$refs.addDept.dialogFormVisible = true;
+      console.log(" this.$refs.addDept.parentId", this.$refs.addDept.parentId);
+      console.log("this.$refs.addDept.dialogFormVisible ",this.$refs.addDept.dialogFormVisible );
     },
     //查看部门
     handleUpdate(id){
@@ -187,12 +179,12 @@ export default {
        find({id:id}).then(res=>{
          console.log("dept:",res.data.data);
                //2、查询的部门绑定到数据模型；
-         this.dept = res.data.data;
+         this.$refs.addDept.dept = res.data.data;
                 //3、显示弹出层
-         this.dialogFormVisible = true;
+         this.$refs.addDept.dialogFormVisible = true;
        })       
     },
-    //干掉部门
+     //干掉部门
     handleDelete(id){
        this.$confirm('删除数据, 是否继续?', '提示', {
           confirmButtonText: '确定',
@@ -215,21 +207,6 @@ export default {
           });          
         });
   
-    },
-    //添加部门
-    saveDept(){
-      this.dept.pid = this.parentId;
-      //alert(this.parentId);
-      saveorupdate(this.dept).then(res=>{
-        //alert(res.data.message);
-        this.$message({
-          message: res.data.message,
-          type: res.data.success? 'success':'error'
-        });
-        if(res.data.success){
-            location.reload();
-        }
-      });
     },
     //构造查询方法
     getList() {
