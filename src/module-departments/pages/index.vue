@@ -123,7 +123,7 @@
         <!--数据结束 -->
       </el-card>
     </div>
-  <!-- 引入组件-->
+  <!--4、 引入组件-->
     <component v-bind:is="deptAdd" ref="addDept"></component>
   </div>
 </template>
@@ -147,15 +147,16 @@
 // 引入API
 import { list,saveorupdate ,find,deleteById} from "@/api/base/dept";
 import commonApi from "@/utils/common";
-//引入自定义的组件
+//1、引入自定义的组件
 import deptAdd from './../components/add'
 
 export default {
-  //注册Add 组件 
+  //2、注册Add 组件 
   components:{deptAdd},
 
   data() {
     return {
+      //3、组件绑定到模型上
       deptAdd:'deptAdd',
       activeName: "first",
       departData: {},

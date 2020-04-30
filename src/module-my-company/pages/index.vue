@@ -16,7 +16,12 @@
           <el-table-column prop="expirationDate" label="结束时间" width="200"></el-table-column>
           <el-table-column prop="state" label="状态" width="120">
             <template  slot-scope="scope">
-              <el-switch v-model="scope.row.status" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+              <el-switch 
+                v-model="scope.row.status" 
+                active-color="#13ce66" 
+                inactive-color="#ff4949"
+                @change="handleStatus(scope.row)"
+                ></el-switch>
             </template>
           </el-table-column>
           <el-table-column fixed="right" label="操作" width="100">
@@ -53,6 +58,10 @@ export default {
         console.log(res.data);
       });
     },
+    //状态切换
+    handleStatus(scopeRowData){
+        console.log(scopeRowData);
+    }
   },
   // 创建完毕状态
   created() {
